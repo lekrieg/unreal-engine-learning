@@ -13,6 +13,7 @@ class UInputMappingContext;
 class UInputAction;
 class AAbyssMagicProjectile;
 class UAbyssInteractionComponent;
+class UAnimMontage;
 
 struct FInputActionValue;
 
@@ -57,6 +58,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack stuff")
 	TSubclassOf<AActor> PrimaryProjectile;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation stuff")
+	UAnimMontage* AttackAnimation;
+
+	//FTimerHandle TimerHandlePrimaryAttack;
+	virtual void BeginPlay() override;
 
 public:	
 	// Called every frame
@@ -68,8 +74,10 @@ public:
 	void LookMouse(const FInputActionValue& InputValue);
 	void Move(const FInputActionValue& InputValue);
 	void PrimaryAttack();
+	void PrimaryAttackTimeElapsed();
 	void PrimaryInteraction();
 	//void Jump(const FInputActionValue& InputValue);
 	//void StopJump(const FInputActionValue& InputValue);
+	void InitAnimations();
 
 };

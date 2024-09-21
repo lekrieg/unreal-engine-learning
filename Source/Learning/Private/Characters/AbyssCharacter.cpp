@@ -5,8 +5,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/StaticMeshComponent.h"
+#include "Animation/AnimMontage.h"
 #include "AbyssInteractionComponent.h"
+#include "Animations/PrimaryAttackNotify.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -30,6 +31,14 @@ AAbyssCharacter::AAbyssCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
+}
+
+// Called when the game starts or when spawned
+void AAbyssCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InitAnimations();
 }
 
 // Called every frame
@@ -62,7 +71,7 @@ void AAbyssCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		
 		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAbyssCharacter::Move);
 		Input->BindAction(LookMouseAction, ETriggerEvent::Triggered, this, &AAbyssCharacter::LookMouse);
-		Input->BindAction(PrimaryAttackAction, ETriggerEvent::Triggered, this, &AAbyssCharacter::PrimaryAttack);
+		Input->BindAction(PrimaryAttackAction, ETriggerEvent::Started, this, &AAbyssCharacter::PrimaryAttack);
 		Input->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &AAbyssCharacter::PrimaryInteraction);
 	}
 }
@@ -95,11 +104,18 @@ void AAbyssCharacter::Move(const FInputActionValue& InputValue)
 
 void AAbyssCharacter::PrimaryAttack()
 {
-	/*if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Attack!"));
-	}*/
+	PlayAnimMontage(AttackAnimation);
+	
+	//GetWorldTimerManager().SetTimer(TimerHandlePrimaryAttack, this, &AAbyssCharacter::PrimaryAttackTimeElapsed, 0.2f);
+	//GetWorldTimerManager().ClearTimer(TimerHandlePrimaryAttack);
+}
 
+void AAbyssCharacter::PrimaryAttackTimeElapsed()
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, FString::Printf(TEXT("Attack!")));
+	}
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
 	FTransform SpawnTransformMatrix = FTransform(APawn::GetControlRotation(), HandLocation);
@@ -112,12 +128,23 @@ void AAbyssCharacter::PrimaryAttack()
 
 void AAbyssCharacter::PrimaryInteraction()
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Interact!"));
-	}
-
 	InteractionComp->PrimaryInteract();
+}
+
+void AAbyssCharacter::InitAnimations()
+{
+	if (AttackAnimation)
+	{
+		const TArray<FAnimNotifyEvent> NotifyEvents = AttackAnimation->Notifies;
+		for (FAnimNotifyEvent N : NotifyEvents)
+		{
+			UPrimaryAttackNotify* PrimaryAttackNotify = Cast<UPrimaryAttackNotify>(N.Notify);
+			if (PrimaryAttackNotify)
+			{
+				PrimaryAttackNotify->OnNotified.AddUObject(this, &AAbyssCharacter::PrimaryAttackTimeElapsed);
+			}
+		}
+	}
 }
 
 //void AAbyssCharacter::Jump(const FInputActionValue& InputValue)
