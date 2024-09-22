@@ -73,6 +73,7 @@ void AAbyssCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		Input->BindAction(LookMouseAction, ETriggerEvent::Triggered, this, &AAbyssCharacter::LookMouse);
 		Input->BindAction(PrimaryAttackAction, ETriggerEvent::Started, this, &AAbyssCharacter::PrimaryAttack);
 		Input->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &AAbyssCharacter::PrimaryInteraction);
+		Input->BindAction(JumpAction, ETriggerEvent::Started, this, &AAbyssCharacter::Jump);
 	}
 }
 
@@ -123,7 +124,11 @@ void AAbyssCharacter::PrimaryAttackTimeElapsed()
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+	SpawnParameters.Instigator = this;
+
 	GetWorld()->SpawnActor<AActor>(PrimaryProjectile, SpawnTransformMatrix, SpawnParameters);
+
+
 }
 
 void AAbyssCharacter::PrimaryInteraction()
@@ -147,11 +152,7 @@ void AAbyssCharacter::InitAnimations()
 	}
 }
 
-//void AAbyssCharacter::Jump(const FInputActionValue& InputValue)
-//{
-//}
-//
-//void AAbyssCharacter::StopJump(const FInputActionValue& InputValue)
-//{
-//}
-
+void AAbyssCharacter::Jump(const FInputActionValue& InputValue)
+{
+	ACharacter::Jump();
+}

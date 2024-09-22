@@ -5,6 +5,7 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "PhysicsEngine/RadialForceComponent.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AExplosiveBarril::AExplosiveBarril()
@@ -27,9 +28,13 @@ AExplosiveBarril::AExplosiveBarril()
 void AExplosiveBarril::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AExplosiveBarril::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 
 	MeshComp->OnComponentHit.AddDynamic(this, &AExplosiveBarril::MyFireImpulse);
-	
 }
 
 void AExplosiveBarril::MyFireImpulse(UPrimitiveComponent* HitComponent, AActor* OtherActor,
@@ -37,10 +42,12 @@ void AExplosiveBarril::MyFireImpulse(UPrimitiveComponent* HitComponent, AActor* 
 {
 	RadialForceComp->FireImpulse();
 
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("EXPLOSION!"));
-	}
+	UE_LOG(LogTemp, Log, TEXT("EXPLOSION!"));
+
+	UE_LOG(LogTemp, Warning, TEXT("OtherActor: %s, at game time: %f"), *GetNameSafe(OtherActor), GetWorld()->TimeSeconds);
+
+	FString CombinedString = FString::Printf(TEXT("Hit at location: %s"), *Hit.ImpactPoint.ToString());
+	DrawDebugString(GetWorld(), Hit.ImpactPoint, CombinedString, nullptr, FColor::Green, 2.0f, true);
 }
 
 // Called every frame

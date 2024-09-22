@@ -76,8 +76,8 @@ public:
 	void PrimaryAttack();
 	void PrimaryAttackTimeElapsed();
 	void PrimaryInteraction();
-	//void Jump(const FInputActionValue& InputValue);
-	//void StopJump(const FInputActionValue& InputValue);
+	void Jump(const FInputActionValue& InputValue);
+	void StopJump(const FInputActionValue& InputValue);
 	void InitAnimations();
 
 };
