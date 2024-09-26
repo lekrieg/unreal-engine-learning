@@ -55,11 +55,20 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* PrimaryInteractionAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* Power1Action;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack stuff")
 	TSubclassOf<AActor> PrimaryProjectile;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Powers stuff")
+	TSubclassOf<AActor> BlackHoleProjectile;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation stuff")
 	UAnimMontage* AttackAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation stuff")
+	UAnimMontage* Power1Animation;
 
 	//FTimerHandle TimerHandlePrimaryAttack;
 	virtual void BeginPlay() override;
@@ -75,9 +84,10 @@ public:
 	void Move(const FInputActionValue& InputValue);
 	void PrimaryAttack();
 	void PrimaryAttackTimeElapsed();
+	void Power1TimeElapsed();
 	void PrimaryInteraction();
 	void Jump(const FInputActionValue& InputValue);
-	void StopJump(const FInputActionValue& InputValue);
+	void Power1();
 	void InitAnimations();
 
 };
