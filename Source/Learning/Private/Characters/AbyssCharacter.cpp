@@ -7,7 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Animation/AnimMontage.h"
 #include "AbyssInteractionComponent.h"
-#include "Animations/PrimaryAttackNotify.h"
+#include "Animations/ProjectileAttackNotify.h"
 #include "Animations/Power1Notify.h"
 #include "DrawDebugHelpers.h"
 
@@ -77,6 +77,7 @@ void AAbyssCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		Input->BindAction(PrimaryInteractionAction, ETriggerEvent::Triggered, this, &AAbyssCharacter::PrimaryInteraction);
 		Input->BindAction(JumpAction, ETriggerEvent::Started, this, &AAbyssCharacter::Jump);
 		Input->BindAction(Power1Action, ETriggerEvent::Triggered, this, &AAbyssCharacter::Power1);
+		Input->BindAction(Power2Action, ETriggerEvent::Triggered, this, &AAbyssCharacter::Power2);
 	}
 }
 
@@ -108,17 +109,18 @@ void AAbyssCharacter::Move(const FInputActionValue& InputValue)
 
 void AAbyssCharacter::PrimaryAttack()
 {
+	ProjectileType = EProjectileType::Magic;
 	PlayAnimMontage(AttackAnimation);
 	
 	//GetWorldTimerManager().SetTimer(TimerHandlePrimaryAttack, this, &AAbyssCharacter::PrimaryAttackTimeElapsed, 0.2f);
 	//GetWorldTimerManager().ClearTimer(TimerHandlePrimaryAttack);
 }
 
-void AAbyssCharacter::PrimaryAttackTimeElapsed()
+void AAbyssCharacter::ProjectileAttackTimeElapsed()
 {
 	// TODO: Redo this using instigator and query to ignore the collision with player
-	// TODO: Blackhole Projectile
-	// TODO: Dash/Teleport Projectile Ability
+	// TODO: Blackhole Projectile - DONE
+	// TODO: Dash/Teleport Projectile Ability, should do this in blueprint
 
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
@@ -151,7 +153,14 @@ void AAbyssCharacter::PrimaryAttackTimeElapsed()
 
 	SpawnParameters.Instigator = this;
 
-	GetWorld()->SpawnActor<AActor>(PrimaryProjectile, SpawnTransformMatrix, SpawnParameters);
+	if (ProjectileType == EProjectileType::Magic)
+	{
+		GetWorld()->SpawnActor<AActor>(PrimaryProjectile, SpawnTransformMatrix, SpawnParameters);
+	}
+	else if (ProjectileType == EProjectileType::Dash)
+	{
+		GetWorld()->SpawnActor<AActor>(DashProjectile, SpawnTransformMatrix, SpawnParameters);
+	}
 }
 
 void AAbyssCharacter::Power1TimeElapsed()
@@ -199,10 +208,10 @@ void AAbyssCharacter::InitAnimations()
 		const TArray<FAnimNotifyEvent> NotifyEvents = AttackAnimation->Notifies;
 		for (FAnimNotifyEvent N : NotifyEvents)
 		{
-			UPrimaryAttackNotify* PrimaryAttackNotify = Cast<UPrimaryAttackNotify>(N.Notify);
-			if (PrimaryAttackNotify)
+			UProjectileAttackNotify* ProjectileAttackNotify = Cast<UProjectileAttackNotify>(N.Notify);
+			if (ProjectileAttackNotify)
 			{
-				PrimaryAttackNotify->OnNotified.AddUObject(this, &AAbyssCharacter::PrimaryAttackTimeElapsed);
+				ProjectileAttackNotify->OnNotified.AddUObject(this, &AAbyssCharacter::ProjectileAttackTimeElapsed);
 			}
 		}
 	}
@@ -229,4 +238,10 @@ void AAbyssCharacter::Jump(const FInputActionValue& InputValue)
 void AAbyssCharacter::Power1()
 {
 	PlayAnimMontage(Power1Animation);
+}
+
+void AAbyssCharacter::Power2()
+{
+	ProjectileType = EProjectileType::Dash;
+	PlayAnimMontage(AttackAnimation);
 }

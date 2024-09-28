@@ -17,10 +17,19 @@ class UAnimMontage;
 
 struct FInputActionValue;
 
+UENUM()
+enum class EProjectileType : uint8
+{
+	Magic UMETA(DisplayName = "Magic"),
+	Dash UMETA(DisplayName = "Dash"),
+};
+
 UCLASS()
 class LEARNING_API AAbyssCharacter : public ACharacter
 {
 	GENERATED_BODY()
+
+	EProjectileType ProjectileType;
 
 public:
 	// Sets default values for this character's properties
@@ -58,11 +67,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* Power1Action;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* Power2Action;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack stuff")
 	TSubclassOf<AActor> PrimaryProjectile;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Powers stuff")
 	TSubclassOf<AActor> BlackHoleProjectile;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Powers stuff")
+	TSubclassOf<AActor> DashProjectile;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation stuff")
 	UAnimMontage* AttackAnimation;
@@ -83,11 +98,12 @@ public:
 	void LookMouse(const FInputActionValue& InputValue);
 	void Move(const FInputActionValue& InputValue);
 	void PrimaryAttack();
-	void PrimaryAttackTimeElapsed();
+	void ProjectileAttackTimeElapsed();
 	void Power1TimeElapsed();
 	void PrimaryInteraction();
 	void Jump(const FInputActionValue& InputValue);
 	void Power1();
+	void Power2();
 	void InitAnimations();
 
 };
