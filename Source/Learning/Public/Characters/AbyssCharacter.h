@@ -8,6 +8,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class UAbyssAttributeComponent;
 
 class UInputMappingContext;
 class UInputAction;
@@ -43,6 +44,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interact stuff")
 	UAbyssInteractionComponent* InteractionComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attribute")
+	UAbyssAttributeComponent* AttributeComp;
 
 protected:
 
@@ -87,6 +91,11 @@ protected:
 
 	//FTimerHandle TimerHandlePrimaryAttack;
 	virtual void BeginPlay() override;
+
+	virtual void PostInitializeComponents() override;
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UAbyssAttributeComponent* OwningComp, float NewHealth, float amount);
 
 public:	
 	// Called every frame

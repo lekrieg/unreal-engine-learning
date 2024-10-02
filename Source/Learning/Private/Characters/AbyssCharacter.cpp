@@ -10,6 +10,7 @@
 #include "Animations/ProjectileAttackNotify.h"
 #include "Animations/Power1Notify.h"
 #include "DrawDebugHelpers.h"
+#include "Characters/AbyssAttributeComponent.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -30,6 +31,8 @@ AAbyssCharacter::AAbyssCharacter()
 
 	InteractionComp = CreateDefaultSubobject<UAbyssInteractionComponent>("InterationComp");
 
+	AttributeComp = CreateDefaultSubobject<UAbyssAttributeComponent>("AttributeComp");
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
@@ -41,6 +44,21 @@ void AAbyssCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	InitAnimations();
+}
+
+void AAbyssCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	AttributeComp->OnHealthChanged.AddDynamic(this, &AAbyssCharacter::OnHealthChanged);
+}
+
+void AAbyssCharacter::OnHealthChanged(AActor* InstigatorActor, UAbyssAttributeComponent* OwningComp, float NewHealth, float amount)
+{
+	if (NewHealth <= 0.0f && amount < 0.0f)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+	}
 }
 
 // Called every frame

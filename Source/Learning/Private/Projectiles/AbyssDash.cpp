@@ -29,7 +29,7 @@ void AAbyssDash::Explode()
 	
 	EffectComp->Deactivate();
 
-	if (EmitterTemplate)
+	if (ensure(EmitterTemplate))
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, GetActorLocation(), FRotator::ZeroRotator, true);
 	}

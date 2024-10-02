@@ -5,6 +5,7 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "PhysicsEngine/RadialForceComponent.h"
+#include "Characters/AbyssAttributeComponent.h"
 #include "DrawDebugHelpers.h"
 
 // Sets default values
@@ -40,6 +41,13 @@ void AExplosiveBarril::PostInitializeComponents()
 void AExplosiveBarril::MyFireImpulse(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
+	UAbyssAttributeComponent* comp = Cast<UAbyssAttributeComponent>(OtherActor->GetComponentByClass(UAbyssAttributeComponent::StaticClass()));
+
+	if (comp)
+	{
+		comp->ApplyHealthChange(-30.0f);
+	}
+
 	RadialForceComp->FireImpulse();
 
 	UE_LOG(LogTemp, Log, TEXT("EXPLOSION!"));
