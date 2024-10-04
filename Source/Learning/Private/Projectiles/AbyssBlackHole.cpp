@@ -12,16 +12,27 @@ void AAbyssBlackHole::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PlaySound(FlightSound);
+
+	GetWorldTimerManager().SetTimer(TimerHandleDestroy, this, &AAbyssBlackHole::SelfDestroy, 5.0f);
 }
 
-// Called every frame
-void AAbyssBlackHole::Tick(float DeltaTime)
+void AAbyssBlackHole::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::Tick(DeltaTime);
-
+	PlaySound(ExplosionSound);
+	if (OtherActor->GetRootComponent()->IsSimulatingPhysics())
+	{
+		OtherActor->Destroy();
+	}
 }
 
-AAbyssBlackHole::AAbyssBlackHole() : Super()
+void AAbyssBlackHole::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AAbyssBlackHole::OnActorOverlap);
+}
+
+AAbyssBlackHole::AAbyssBlackHole()
 {
 	SphereComp->SetCollisionObjectType(ECC_PhysicsBody);
 

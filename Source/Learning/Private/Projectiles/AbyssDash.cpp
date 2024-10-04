@@ -14,19 +14,20 @@ void AAbyssDash::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PlaySound(FlightSound);
 	GetWorldTimerManager().SetTimer(TimerHandleExplosion, this, &AAbyssDash::Explode, 0.2f);
 }
 
 void AAbyssDash::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	SphereComp->OnComponentHit.AddDynamic(this, &AAbyssDash::ExplodeOnHit);
+	SphereComp->OnComponentHit.AddDynamic(this, &AAbyssDash::OnActorHit);
 }
 
 void AAbyssDash::Explode()
 {
 	ProjectileMovementComp->StopMovementImmediately();
-	
+
 	EffectComp->Deactivate();
 
 	if (ensure(EmitterTemplate))
@@ -34,12 +35,14 @@ void AAbyssDash::Explode()
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, GetActorLocation(), FRotator::ZeroRotator, true);
 	}
 
+	PlaySound(ExplosionSound);
+
 	//GetInstigator();
 	GetWorldTimerManager().ClearTimer(TimerHandleExplosion);
 	GetWorldTimerManager().SetTimer(TimerHandleExplosion, this, &AAbyssDash::TeleportPlayer, 0.2f);
 }
 
-void AAbyssDash::ExplodeOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+void AAbyssDash::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Explode();
 }
@@ -48,11 +51,6 @@ void AAbyssDash::TeleportPlayer()
 {
 	AAbyssCharacter* player = Cast<AAbyssCharacter>(GetInstigator());
 	player->SetActorRelativeLocation(GetActorLocation(), true);
-}
 
-// Called every frame
-void AAbyssDash::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	Destroy();
 }

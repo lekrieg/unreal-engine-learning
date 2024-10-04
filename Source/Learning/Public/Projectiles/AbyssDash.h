@@ -4,19 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Projectiles/AbyssMagicProjectile.h"
+#include "AbyssProjectileBase.h"
 #include "AbyssDash.generated.h"
 
 class UParticleSystem;
 
 UCLASS()
-class LEARNING_API AAbyssDash : public AAbyssMagicProjectile
+class LEARNING_API AAbyssDash : public AAbyssProjectileBase
 {
 	GENERATED_BODY()
 	
 protected:
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Emitter stuff")
-	UParticleSystem* EmitterTemplate;
 
 	FTimerHandle TimerHandleExplosion;
 
@@ -26,14 +24,8 @@ protected:
 
 	void Explode();
 
-	UFUNCTION()
-	void ExplodeOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+	virtual void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit) override;
 
 	void TeleportPlayer();
-
-public:
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 };

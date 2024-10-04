@@ -3,31 +3,20 @@
 
 #include "Projectiles/AbyssMagicProjectile.h"
 #include "Components/SphereComponent.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Characters/AbyssAttributeComponent.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AAbyssMagicProjectile::AAbyssMagicProjectile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
-	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
-	//SphereComp->SetCollisionObjectType(ECC_WorldDynamic);
-	//SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	//SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	SphereComp->SetCollisionProfileName("Projectile");
-	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AAbyssMagicProjectile::OnActorOverlap);
-	RootComponent = SphereComp;
-
-	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
-	EffectComp->SetupAttachment(SphereComp);
-
-	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComp");
-	ProjectileMovementComp->InitialSpeed = 1000.0f;
-	ProjectileMovementComp->bRotationFollowsVelocity = true;
-	ProjectileMovementComp->bInitialVelocityInLocalSpace = true;
 }
 
 // Called when the game starts or when spawned
@@ -35,6 +24,23 @@ void AAbyssMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	PlaySound(FlightSound);
+}
+
+void AAbyssMagicProjectile::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AAbyssMagicProjectile::OnActorOverlap);
+	SphereComp->OnComponentHit.AddDynamic(this, &AAbyssMagicProjectile::OnActorHit);
+}
+
+void AAbyssMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 40.0f, 8, FColor::White, false, 1.0f, 0, 2.0f);
+
+	PlaySound(ExplosionSound);
+
+	Super::OnActorHit(HitComponent, OtherActor, OtherComponent, NormalImpulse, Hit);
 }
 
 void AAbyssMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -47,15 +53,7 @@ void AAbyssMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedCompon
 		{
 			comp->ApplyHealthChange(-20.0f);
 
-			Destroy();
+			SelfDestroy();
 		}
 	}
 }
-
-// Called every frame
-void AAbyssMagicProjectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

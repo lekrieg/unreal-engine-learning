@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Projectiles/AbyssMagicProjectile.h"
+#include "AbyssProjectileBase.h"
 #include "AbyssBlackHole.generated.h"
 
 class URadialForceComponent;
@@ -12,7 +13,7 @@ class URadialForceComponent;
  * 
  */
 UCLASS()
-class LEARNING_API AAbyssBlackHole : public AAbyssMagicProjectile
+class LEARNING_API AAbyssBlackHole : public AAbyssProjectileBase
 {
 	GENERATED_BODY()
 	
@@ -24,10 +25,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
+	virtual void PostInitializeComponents() override;
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+
+public:
 
 	AAbyssBlackHole();
 };
