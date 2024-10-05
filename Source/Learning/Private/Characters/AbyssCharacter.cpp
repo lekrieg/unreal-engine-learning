@@ -54,10 +54,21 @@ void AAbyssCharacter::PostInitializeComponents()
 
 void AAbyssCharacter::OnHealthChanged(AActor* InstigatorActor, UAbyssAttributeComponent* OwningComp, float NewHealth, float amount)
 {
-	if (NewHealth <= 0.0f && amount < 0.0f)
+	if (amount < 0.0f)
 	{
-		APlayerController* PC = Cast<APlayerController>(GetController());
-		DisableInput(PC);
+		if (NewHealth > 0)
+		{
+			USkeletalMeshComponent* MeshComp = GetMesh();
+			MeshComp->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
+			MeshComp->SetScalarParameterValueOnMaterials("HitFlashSpeed", 4);
+			MeshComp->SetVectorParameterValueOnMaterials("HitFlashColor", FVector(FColor::Red));
+		}
+
+		if (NewHealth <= 0.0f)
+		{
+			APlayerController* PC = Cast<APlayerController>(GetController());
+			DisableInput(PC);
+		}
 	}
 }
 
