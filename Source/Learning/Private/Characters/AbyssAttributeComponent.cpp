@@ -10,12 +10,15 @@ UAbyssAttributeComponent::UAbyssAttributeComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	Health = 100.0f;
+	MaxHealth = 100.0f;
+	Health = MaxHealth;
 }
 
 bool UAbyssAttributeComponent::ApplyHealthChange(float amount)
 {
 	Health += amount;
+
+	Health = FMath::Clamp(Health, 0, MaxHealth);
 
 	OnHealthChanged.Broadcast(nullptr, this, Health, amount);
 
