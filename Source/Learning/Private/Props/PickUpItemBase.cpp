@@ -5,6 +5,8 @@
 
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 APickUpItemBase::APickUpItemBase()
@@ -22,6 +24,8 @@ APickUpItemBase::APickUpItemBase()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
 	MeshComp->SetupAttachment(SphereComp);
 
+	AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
+
 	bCanInteract = true;
 }
 
@@ -38,6 +42,15 @@ void APickUpItemBase::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, A
 
 void APickUpItemBase::Interact_Implementation(APawn* InstigatorPawn)
 {
+}
+
+void APickUpItemBase::PlaySound(USoundCue* sound)
+{
+	if (AudioComp && sound)
+	{
+		AudioComp->SetSound(sound);
+		AudioComp->Play();
+	}
 }
 
 // Called every frame

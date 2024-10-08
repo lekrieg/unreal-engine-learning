@@ -69,7 +69,7 @@ void AAbyssProjectileBase::SelfDestroy()
 
 void AAbyssProjectileBase::PlaySound(USoundCue* sound)
 {
-	if (AudioComp)
+	if (AudioComp && sound)
 	{
 		AudioComp->SetSound(sound);
 		AudioComp->Play();

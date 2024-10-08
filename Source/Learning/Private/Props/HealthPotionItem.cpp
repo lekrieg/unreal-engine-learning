@@ -4,6 +4,7 @@
 #include "Props/HealthPotionItem.h"
 #include "Characters/AbyssAttributeComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 void AHealthPotionItem::PostInitializeComponents()
 {
@@ -17,16 +18,19 @@ void AHealthPotionItem::PostInitializeComponents()
 
 void AHealthPotionItem::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// TODO: Add sound cue when pick up item
-	// TODO: Add effect when pick up item
-	// TODO: Ignore intection if healt if full
-
 	if (bCanInteract && OtherActor)
 	{
 		UAbyssAttributeComponent* Comp = Cast<UAbyssAttributeComponent>(OtherActor->GetComponentByClass(UAbyssAttributeComponent::StaticClass()));
 
-		if (Comp)
+		if (Comp && !Comp->IsHealthFull())
 		{
+			PlaySound(PickUpSound);
+
+			if (EmitterTemplate)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, GetActorLocation(), FRotator::ZeroRotator, true);
+			}
+
 			MeshComp->SetVisibility(!MeshComp->IsVisible());
 			bCanInteract = false;
 
@@ -42,8 +46,10 @@ void AHealthPotionItem::Interact_Implementation(APawn* InstigatorPawn)
 	{
 		UAbyssAttributeComponent* Comp = Cast<UAbyssAttributeComponent>(InstigatorPawn->GetComponentByClass(UAbyssAttributeComponent::StaticClass()));
 
-		if (Comp)
+		if (Comp && !Comp->IsHealthFull())
 		{
+			PlaySound(PickUpSound);
+
 			MeshComp->SetVisibility(!MeshComp->IsVisible());
 			bCanInteract = false;
 

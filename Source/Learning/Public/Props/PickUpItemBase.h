@@ -9,6 +9,9 @@
 
 class USphereComponent;
 class UStaticMeshComponent;
+class UAudioComponent;
+class USoundCue;
+class UParticleSystem;
 
 UCLASS(ABSTRACT)
 class LEARNING_API APickUpItemBase : public AActor, public IAbyssGameplayInterface
@@ -33,6 +36,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float ValueAmount;
 
+	// SFX STUFF
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio stuff")
+	UAudioComponent* AudioComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio stuff")
+	USoundCue* PickUpSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Emitter stuff")
+	UParticleSystem* EmitterTemplate;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -41,6 +54,8 @@ protected:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn);
+
+	void PlaySound(USoundCue* sound);
 
 public:	
 	// Called every frame

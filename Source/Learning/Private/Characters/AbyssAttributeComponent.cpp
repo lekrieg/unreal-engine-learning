@@ -30,3 +30,8 @@ bool UAbyssAttributeComponent::IsAlive() const
 	return Health > 0.0f;
 }
 
+bool UAbyssAttributeComponent::IsHealthFull() const
+{
+	return Health >= MaxHealth;
+}
+

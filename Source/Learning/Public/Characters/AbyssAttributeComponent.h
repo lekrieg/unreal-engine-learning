@@ -36,4 +36,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;
 
+	bool IsHealthFull() const;
+
 };
