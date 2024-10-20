@@ -148,8 +148,6 @@ void AAbyssCharacter::PrimaryAttack()
 void AAbyssCharacter::ProjectileAttackTimeElapsed()
 {
 	// TODO: Redo this using instigator and query to ignore the collision with player
-	// TODO: Blackhole Projectile - DONE
-	// TODO: Dash/Teleport Projectile Ability, should do this in blueprint
 
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 

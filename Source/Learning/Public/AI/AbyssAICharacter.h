@@ -6,21 +6,32 @@
 #include "GameFramework/Character.h"
 #include "AbyssAICharacter.generated.h"
 
+// there's the perception too, check this later
+class UPawnSensingComponent;
+class UAbyssAttributeComponent;
+
 UCLASS()
 class LEARNING_API AAbyssAICharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
+
 	AAbyssAICharacter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPawnSensingComponent* PawnSensingComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attribute")
+	UAbyssAttributeComponent* AttributeComp;
+
+	virtual void PostInitializeComponents() override;
+
+	UFUNCTION()
+	void OnPawnSeen(APawn* Pawn);
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UAbyssAttributeComponent* OwningComp, float NewHealth, float amount);
 };

@@ -35,3 +35,7 @@ bool UAbyssAttributeComponent::IsHealthFull() const
 	return Health >= MaxHealth;
 }
 
+float UAbyssAttributeComponent::GetActualHealth() const
+{
+	return Health;
+}
