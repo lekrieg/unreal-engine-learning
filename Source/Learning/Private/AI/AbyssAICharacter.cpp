@@ -9,6 +9,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Characters/AbyssAttributeComponent.h"
 #include "DrawDebugHelpers.h"
+#include "BrainComponent.h"
 
 AAbyssAICharacter::AAbyssAICharacter()
 {
@@ -17,6 +18,8 @@ AAbyssAICharacter::AAbyssAICharacter()
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	AttributeComp = CreateDefaultSubobject<UAbyssAttributeComponent>("AttribComp");
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void AAbyssAICharacter::PostInitializeComponents()
@@ -54,12 +57,16 @@ void AAbyssAICharacter::OnHealthChanged(AActor* InstigatorActor, UAbyssAttribute
 
 		if (NewHealth <= 0.0f)
 		{
-			/*AAbyssAIController* AC = Cast<AAbyssAIController>(GetController());
-			AC->UnPossess();
-			AC->Destroy();
-			Destroy();*/
+			AAbyssAIController* AIC = Cast<AAbyssAIController>(GetController());
+			if (AIC)
+			{
+				AIC->GetBrainComponent()->StopLogic("Killed");
+			}
 
-			// TODO: Add timer to destroy enemy
+			GetMesh()->SetAllBodiesSimulatePhysics(true);
+			GetMesh()->SetCollisionProfileName("Ragdoll");
+
+			SetLifeSpan(10.0f);
 		}
 	}
 }

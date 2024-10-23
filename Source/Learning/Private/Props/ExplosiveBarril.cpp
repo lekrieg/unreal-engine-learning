@@ -25,12 +25,6 @@ AExplosiveBarril::AExplosiveBarril()
 	RadialForceComp->SetupAttachment(MeshComp);
 }
 
-// Called when the game starts or when spawned
-void AExplosiveBarril::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void AExplosiveBarril::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -57,11 +51,3 @@ void AExplosiveBarril::MyFireImpulse(UPrimitiveComponent* HitComponent, AActor* 
 	FString CombinedString = FString::Printf(TEXT("Hit at location: %s"), *Hit.ImpactPoint.ToString());
 	DrawDebugString(GetWorld(), Hit.ImpactPoint, CombinedString, nullptr, FColor::Green, 2.0f, true);
 }
-
-// Called every frame
-void AExplosiveBarril::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

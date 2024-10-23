@@ -19,8 +19,6 @@ public:
 	AExplosiveBarril();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 	virtual void PostInitializeComponents() override;
 
@@ -35,9 +33,5 @@ protected:
 	UFUNCTION()
 	void MyFireImpulse(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 };

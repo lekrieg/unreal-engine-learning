@@ -47,6 +47,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio stuff")
 	USoundCue* ExplosionSound;
+
+	UPROPERTY(EditAnywhere, Category = "Damage stuff")
+	float Damage = 40.0f;
 	
 	UFUNCTION()
 	virtual void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,

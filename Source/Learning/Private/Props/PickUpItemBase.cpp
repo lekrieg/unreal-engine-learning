@@ -29,13 +29,6 @@ APickUpItemBase::APickUpItemBase()
 	bCanInteract = true;
 }
 
-// Called when the game starts or when spawned
-void APickUpItemBase::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
 void APickUpItemBase::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 }
@@ -51,11 +44,4 @@ void APickUpItemBase::PlaySound(USoundCue* sound)
 		AudioComp->SetSound(sound);
 		AudioComp->Play();
 	}
-}
-
-// Called every frame
-void APickUpItemBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }

@@ -46,9 +46,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Emitter stuff")
 	UParticleSystem* EmitterTemplate;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 	UFUNCTION()
 	virtual void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -56,9 +53,5 @@ protected:
 	virtual void Interact_Implementation(APawn* InstigatorPawn);
 
 	void PlaySound(USoundCue* sound);
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 };

@@ -72,13 +72,6 @@ void AAbyssCharacter::OnHealthChanged(AActor* InstigatorActor, UAbyssAttributeCo
 	}
 }
 
-// Called every frame
-void AAbyssCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 // Called to bind functionality to input
 void AAbyssCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

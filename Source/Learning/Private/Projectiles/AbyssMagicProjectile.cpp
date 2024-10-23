@@ -36,7 +36,7 @@ void AAbyssMagicProjectile::PostInitializeComponents()
 
 void AAbyssMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 40.0f, 8, FColor::White, false, 1.0f, 0, 2.0f);
+	DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Damage, 8, FColor::White, false, 1.0f, 0, 2.0f);
 
 	PlaySound(ExplosionSound);
 

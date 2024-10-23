@@ -28,15 +28,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	UStaticMeshComponent* LidMeshComp;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 public:	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Lid stuff")
 	float TargetPitch = 110;
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 };

@@ -19,20 +19,6 @@ AAbyssItemChest::AAbyssItemChest()
 
 }
 
-// Called when the game starts or when spawned
-void AAbyssItemChest::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AAbyssItemChest::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void AAbyssItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
 	LidMeshComp->SetRelativeRotation(FRotator(TargetPitch, 0, 0));
