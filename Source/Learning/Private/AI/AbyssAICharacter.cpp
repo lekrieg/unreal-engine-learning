@@ -10,6 +10,7 @@
 #include "Characters/AbyssAttributeComponent.h"
 #include "DrawDebugHelpers.h"
 #include "BrainComponent.h"
+#include "Components/CapsuleComponent.h"
 
 AAbyssAICharacter::AAbyssAICharacter()
 {
@@ -31,20 +32,19 @@ void AAbyssAICharacter::PostInitializeComponents()
 
 void AAbyssAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	AAIController* AIC = Cast<AAIController>(GetController());
-
-	if (AIC)
-	{
-		 UBlackboardComponent* BBComp = AIC->GetBlackboardComponent();
-
-		 BBComp->SetValueAsObject("TargetActor", Pawn);
-
-		 DrawDebugString(GetWorld(), GetActorLocation(), "Player spotted!", nullptr, FColor::Orange, 4.0f, false);
-	}
+	SetTargetActor(Pawn);
+	
+	DrawDebugString(GetWorld(), GetActorLocation(), "Player spotted!", nullptr, FColor::Orange, 4.0f, false);
 }
 
 void AAbyssAICharacter::OnHealthChanged(AActor* InstigatorActor, UAbyssAttributeComponent* OwningComp, float NewHealth, float amount)
 {
+	if (InstigatorActor)
+	{
+		SetTargetActor(InstigatorActor);
+
+	}
+
 	if (amount < 0.0f)
 	{
 		if (NewHealth > 0)
@@ -63,10 +63,22 @@ void AAbyssAICharacter::OnHealthChanged(AActor* InstigatorActor, UAbyssAttribute
 				AIC->GetBrainComponent()->StopLogic("Killed");
 			}
 
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
 			GetMesh()->SetCollisionProfileName("Ragdoll");
 
 			SetLifeSpan(10.0f);
 		}
+	}
+}
+
+void AAbyssAICharacter::SetTargetActor(AActor* NewTarget)
+{
+	AAIController* AIC = Cast<AAIController>(GetController());
+
+	if (AIC)
+	{
+		AIC->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);
 	}
 }

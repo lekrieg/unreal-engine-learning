@@ -14,7 +14,14 @@ class LEARNING_API UBTTask_AbyssRangedAttack : public UBTTaskNode
 {
 	GENERATED_BODY()
 	
+public:
+
+	UBTTask_AbyssRangedAttack();
+
 protected:
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float MaxBulletSpread;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	TSubclassOf<AActor> ProjectileClass;

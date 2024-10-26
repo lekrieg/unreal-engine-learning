@@ -34,7 +34,7 @@ void AHealthPotionItem::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 			MeshComp->SetVisibility(!MeshComp->IsVisible());
 			bCanInteract = false;
 
-			Comp->ApplyHealthChange(ValueAmount);
+			Comp->ApplyHealthChange(this, ValueAmount);
 			GetWorldTimerManager().SetTimer(TimerHandleChangeState, this, &AHealthPotionItem::ChangeInteractionState, 10.0f);
 		}
 	}
@@ -53,7 +53,7 @@ void AHealthPotionItem::Interact_Implementation(APawn* InstigatorPawn)
 			MeshComp->SetVisibility(!MeshComp->IsVisible());
 			bCanInteract = false;
 
-			Comp->ApplyHealthChange(ValueAmount);
+			Comp->ApplyHealthChange(this, ValueAmount);
 			GetWorldTimerManager().SetTimer(TimerHandleChangeState, this, &AHealthPotionItem::ChangeInteractionState, 10.0f);
 		}
 	}

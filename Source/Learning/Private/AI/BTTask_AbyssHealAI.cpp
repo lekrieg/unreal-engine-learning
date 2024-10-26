@@ -20,8 +20,8 @@ EBTNodeResult::Type UBTTask_AbyssHealAI::ExecuteTask(UBehaviorTreeComponent& Own
 			return EBTNodeResult::Failed;
 		}
 
-		UAbyssAttributeComponent* comp = Cast<UAbyssAttributeComponent>(MyPawn->GetComponentByClass(UAbyssAttributeComponent::StaticClass()));
-		comp->ApplyHealthChange(40);
+		UAbyssAttributeComponent* comp = UAbyssAttributeComponent::GetAttributeComp(MyPawn);
+		comp->ApplyHealthChange(MyPawn, 40);
 
 		return EBTNodeResult::Succeeded;
 	}

@@ -35,11 +35,11 @@ void AExplosiveBarril::PostInitializeComponents()
 void AExplosiveBarril::MyFireImpulse(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UAbyssAttributeComponent* comp = Cast<UAbyssAttributeComponent>(OtherActor->GetComponentByClass(UAbyssAttributeComponent::StaticClass()));
+	UAbyssAttributeComponent* comp = UAbyssAttributeComponent::GetAttributeComp(OtherActor);
 
 	if (comp)
 	{
-		comp->ApplyHealthChange(-30.0f);
+		comp->ApplyHealthChange(this, -30.0f);
 	}
 
 	RadialForceComp->FireImpulse();

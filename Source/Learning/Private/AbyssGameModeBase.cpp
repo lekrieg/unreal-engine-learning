@@ -46,7 +46,7 @@ void AAbyssGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Que
 	{
 		AAbyssAICharacter* Bot = *It;
 
-		UAbyssAttributeComponent* AttributeComp = Cast<UAbyssAttributeComponent>(Bot->GetComponentByClass(UAbyssAttributeComponent::StaticClass()));
+		UAbyssAttributeComponent* AttributeComp = UAbyssAttributeComponent::GetAttributeComp(Bot);
 
 		if (AttributeComp && AttributeComp->IsAlive())
 		{

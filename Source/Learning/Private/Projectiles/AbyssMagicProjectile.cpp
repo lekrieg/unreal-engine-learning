@@ -47,11 +47,11 @@ void AAbyssMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedCompon
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		UAbyssAttributeComponent* comp = Cast<UAbyssAttributeComponent>(OtherActor->GetComponentByClass(UAbyssAttributeComponent::StaticClass()));
+		UAbyssAttributeComponent* comp = UAbyssAttributeComponent::GetAttributeComp(OtherActor);
 
 		if (comp)
 		{
-			comp->ApplyHealthChange(-20.0f);
+			comp->ApplyHealthChange(GetInstigator(), -20.0f);
 
 			SelfDestroy();
 		}

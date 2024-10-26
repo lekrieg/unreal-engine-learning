@@ -6,7 +6,13 @@
 #include "AIController.h"
 #include "GameFramework/Character.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Characters/AbyssAttributeComponent.h"
 
+
+UBTTask_AbyssRangedAttack::UBTTask_AbyssRangedAttack()
+{
+	MaxBulletSpread = 2.0f;
+}
 
 EBTNodeResult::Type UBTTask_AbyssRangedAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -28,8 +34,16 @@ EBTNodeResult::Type UBTTask_AbyssRangedAttack::ExecuteTask(UBehaviorTreeComponen
 			return EBTNodeResult::Failed;
 		}
 
+		if (!UAbyssAttributeComponent::CheckIfActorIsAlive(TargetActor))
+		{
+			return EBTNodeResult::Failed;
+		}
+
 		FVector Direction = TargetActor->GetActorLocation() - MuzzleLocation;
 		FRotator MuzzleRotation = Direction.Rotation();
+
+		MuzzleRotation.Pitch += FMath::RandRange(0.0f, MaxBulletSpread);
+		MuzzleRotation.Yaw += FMath::RandRange(-MaxBulletSpread, MaxBulletSpread);
 
 		FActorSpawnParameters Params;
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

@@ -28,10 +28,16 @@ protected:
 
 public:
 
+	UFUNCTION(BlueprintCallable, Category = "Attribute")
+	static UAbyssAttributeComponent* GetAttributeComp(AActor* TargetActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Attribute")
+	static bool CheckIfActorIsAlive(AActor* TargetActor);
+
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
 
-	bool ApplyHealthChange(float amount);
+	bool ApplyHealthChange(AActor* InstigatorActor, float amount);
 
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;

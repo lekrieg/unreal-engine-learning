@@ -34,4 +34,6 @@ protected:
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UAbyssAttributeComponent* OwningComp, float NewHealth, float amount);
+
+	void SetTargetActor(AActor* NewTarget);
 };
