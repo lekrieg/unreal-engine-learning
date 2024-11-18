@@ -5,12 +5,10 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Animation/AnimMontage.h"
 #include "AbyssInteractionComponent.h"
-#include "Animations/ProjectileAttackNotify.h"
-#include "Animations/Power1Notify.h"
 #include "DrawDebugHelpers.h"
 #include "Characters/AbyssAttributeComponent.h"
+#include "Actions/AbyssActionComponent.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -33,6 +31,8 @@ AAbyssCharacter::AAbyssCharacter()
 
 	AttributeComp = CreateDefaultSubobject<UAbyssAttributeComponent>("AttributeComp");
 
+	ActionComp = CreateDefaultSubobject<UAbyssActionComponent>("ActionComp");
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
@@ -42,8 +42,6 @@ AAbyssCharacter::AAbyssCharacter()
 void AAbyssCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	InitAnimations();
 }
 
 void AAbyssCharacter::PostInitializeComponents()
@@ -54,22 +52,23 @@ void AAbyssCharacter::PostInitializeComponents()
 
 void AAbyssCharacter::OnHealthChanged(AActor* InstigatorActor, UAbyssAttributeComponent* OwningComp, float NewHealth, float amount)
 {
-	if (amount < 0.0f)
+	if (OwningComp->IsAlive() && amount < 0.0f)
 	{
-		if (NewHealth > 0)
-		{
-			USkeletalMeshComponent* MeshComp = GetMesh();
-			MeshComp->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
-			MeshComp->SetScalarParameterValueOnMaterials("HitFlashSpeed", 4);
-			MeshComp->SetVectorParameterValueOnMaterials("HitFlashColor", FVector(FColor::Red));
-		}
-
-		if (NewHealth <= 0.0f)
-		{
-			APlayerController* PC = Cast<APlayerController>(GetController());
-			DisableInput(PC);
-		}
+		USkeletalMeshComponent* MeshComp = GetMesh();
+		MeshComp->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
+		MeshComp->SetScalarParameterValueOnMaterials("HitFlashSpeed", 4);
+		MeshComp->SetVectorParameterValueOnMaterials("HitFlashColor", FVector(FColor::Red));
 	}
+	else if (!OwningComp->IsAlive())
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+	}
+}
+
+FVector AAbyssCharacter::GetPawnViewLocation() const
+{
+	return CameraComp->GetComponentLocation();
 }
 
 // Called to bind functionality to input
@@ -100,6 +99,8 @@ void AAbyssCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		Input->BindAction(JumpAction, ETriggerEvent::Started, this, &AAbyssCharacter::Jump);
 		Input->BindAction(Power1Action, ETriggerEvent::Triggered, this, &AAbyssCharacter::Power1);
 		Input->BindAction(Power2Action, ETriggerEvent::Triggered, this, &AAbyssCharacter::Power2);
+		Input->BindAction(SprintAction, ETriggerEvent::Started, this, &AAbyssCharacter::StartSprint);
+		Input->BindAction(SprintAction, ETriggerEvent::Completed, this, &AAbyssCharacter::StopSprint);
 	}
 }
 
@@ -131,89 +132,10 @@ void AAbyssCharacter::Move(const FInputActionValue& InputValue)
 
 void AAbyssCharacter::PrimaryAttack()
 {
-	ProjectileType = EProjectileType::Magic;
-	PlayAnimMontage(AttackAnimation);
+	ActionComp->StartActionByName(this, "PrimaryAttack");
 	
 	//GetWorldTimerManager().SetTimer(TimerHandlePrimaryAttack, this, &AAbyssCharacter::PrimaryAttackTimeElapsed, 0.2f);
 	//GetWorldTimerManager().ClearTimer(TimerHandlePrimaryAttack);
-}
-
-void AAbyssCharacter::ProjectileAttackTimeElapsed()
-{
-	// TODO: Redo this using instigator and query to ignore the collision with player
-
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-
-	FVector Start = CameraComp->GetComponentLocation();
-	FVector End = Start + (APawn::GetControlRotation().Vector() * 1000);
-
-	FHitResult Hit;
-	bool bHit = GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, ObjectQueryParams);
-	
-	if (bHit)
-	{
-		UE_LOG(LogTemp, Log, TEXT("OtherActor: %s, at game time: %f"), *GetNameSafe(Hit.GetActor()), GetWorld()->TimeSeconds);
-		End = Hit.ImpactPoint;
-	}
-
-	FColor LineColor = bHit ? FColor::Green : FColor::Red;
-	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 2.0f);
-
-	//FVector Direction = (Hit.ImpactPoint - HandLocation).GetSafeNormal();
-	FRotator ProjRotation = FRotationMatrix::MakeFromX(End - HandLocation).Rotator();
-
-	FTransform SpawnTransformMatrix = FTransform(ProjRotation, HandLocation);
-
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	SpawnParameters.Instigator = this;
-
-	if (ProjectileType == EProjectileType::Magic)
-	{
-		GetWorld()->SpawnActor<AActor>(PrimaryProjectile, SpawnTransformMatrix, SpawnParameters);
-	}
-	else if (ProjectileType == EProjectileType::Dash)
-	{
-		GetWorld()->SpawnActor<AActor>(DashProjectile, SpawnTransformMatrix, SpawnParameters);
-	}
-}
-
-void AAbyssCharacter::Power1TimeElapsed()
-{
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_PhysicsBody);
-
-	FVector Start = CameraComp->GetComponentLocation();
-	FVector End = Start + (APawn::GetControlRotation().Vector() * 1000);
-
-	FHitResult Hit;
-	bool bHit = GetWorld()->LineTraceSingleByObjectType(Hit, Start, End, ObjectQueryParams);
-
-	if (bHit)
-	{
-		End = Hit.ImpactPoint;
-	}
-
-	FVector Direction = (End - HandLocation).GetSafeNormal2D();
-	FRotator ProjRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
-	ProjRotation.Pitch = 0;
-	ProjRotation.Roll = 0;
-
-	FTransform SpawnTransformMatrix = FTransform(ProjRotation, HandLocation);
-
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	SpawnParameters.Instigator = this;
-
-	GetWorld()->SpawnActor<AActor>(BlackHoleProjectile, SpawnTransformMatrix, SpawnParameters);
 }
 
 void AAbyssCharacter::PrimaryInteraction()
@@ -221,33 +143,14 @@ void AAbyssCharacter::PrimaryInteraction()
 	InteractionComp->PrimaryInteract();
 }
 
-void AAbyssCharacter::InitAnimations()
+void AAbyssCharacter::StartSprint()
 {
-	if (AttackAnimation)
-	{
-		const TArray<FAnimNotifyEvent> NotifyEvents = AttackAnimation->Notifies;
-		for (FAnimNotifyEvent N : NotifyEvents)
-		{
-			UProjectileAttackNotify* ProjectileAttackNotify = Cast<UProjectileAttackNotify>(N.Notify);
-			if (ProjectileAttackNotify)
-			{
-				ProjectileAttackNotify->OnNotified.AddUObject(this, &AAbyssCharacter::ProjectileAttackTimeElapsed);
-			}
-		}
-	}
+	ActionComp->StartActionByName(this, "Sprint");
+}
 
-	if (Power1Animation)
-	{
-		const TArray<FAnimNotifyEvent> NotifyEvents = Power1Animation->Notifies;
-		for (FAnimNotifyEvent N : NotifyEvents)
-		{
-			UPower1Notify* Power1Notify = Cast<UPower1Notify>(N.Notify);
-			if (Power1Notify)
-			{
-				Power1Notify->OnNotified.AddUObject(this, &AAbyssCharacter::Power1TimeElapsed);
-			}
-		}
-	}
+void AAbyssCharacter::StopSprint()
+{
+	ActionComp->StopActionByName(this, "Sprint");
 }
 
 void AAbyssCharacter::Jump(const FInputActionValue& InputValue)
@@ -257,11 +160,10 @@ void AAbyssCharacter::Jump(const FInputActionValue& InputValue)
 
 void AAbyssCharacter::Power1()
 {
-	PlayAnimMontage(Power1Animation);
+	ActionComp->StartActionByName(this, "Blackhole");
 }
 
 void AAbyssCharacter::Power2()
 {
-	ProjectileType = EProjectileType::Dash;
-	PlayAnimMontage(AttackAnimation);
+	ActionComp->StartActionByName(this, "Dash");
 }

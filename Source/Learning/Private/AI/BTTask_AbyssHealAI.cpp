@@ -21,7 +21,7 @@ EBTNodeResult::Type UBTTask_AbyssHealAI::ExecuteTask(UBehaviorTreeComponent& Own
 		}
 
 		UAbyssAttributeComponent* comp = UAbyssAttributeComponent::GetAttributeComp(MyPawn);
-		comp->ApplyHealthChange(MyPawn, 40);
+		comp->ApplyHealthChange(MyPawn, 50);
 
 		return EBTNodeResult::Succeeded;
 	}

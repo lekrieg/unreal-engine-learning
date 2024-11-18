@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "DrawDebugHelpers.h"
+#include "AbyssGameplayFunctionLibrary.h"
 
 // Sets default values
 AAbyssMagicProjectile::AAbyssMagicProjectile()
@@ -47,12 +48,18 @@ void AAbyssMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedCompon
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		UAbyssAttributeComponent* comp = UAbyssAttributeComponent::GetAttributeComp(OtherActor);
+		/*UAbyssAttributeComponent* comp = UAbyssAttributeComponent::GetAttributeComp(OtherActor);
 
 		if (comp)
 		{
-			comp->ApplyHealthChange(GetInstigator(), -20.0f);
+			comp->ApplyHealthChange(GetInstigator(), -Damage);
 
+			SelfDestroy();
+		}*/
+
+		// TODO: Fix this, seems that the impulse isn't being applied
+		if (UAbyssGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, Damage, SweepResult))
+		{
 			SelfDestroy();
 		}
 	}

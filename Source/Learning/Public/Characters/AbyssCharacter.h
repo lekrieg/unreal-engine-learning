@@ -12,25 +12,15 @@ class UAbyssAttributeComponent;
 
 class UInputMappingContext;
 class UInputAction;
-class AAbyssMagicProjectile;
 class UAbyssInteractionComponent;
-class UAnimMontage;
+class UAbyssActionComponent;
 
 struct FInputActionValue;
-
-UENUM()
-enum class EProjectileType : uint8
-{
-	Magic UMETA(DisplayName = "Magic"),
-	Dash UMETA(DisplayName = "Dash"),
-};
 
 UCLASS()
 class LEARNING_API AAbyssCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
-	EProjectileType ProjectileType;
 
 public:
 	// Sets default values for this character's properties
@@ -74,20 +64,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* Power2Action;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack stuff")
-	TSubclassOf<AActor> PrimaryProjectile;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* SprintAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Powers stuff")
-	TSubclassOf<AActor> BlackHoleProjectile;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Powers stuff")
-	TSubclassOf<AActor> DashProjectile;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation stuff")
-	UAnimMontage* AttackAnimation;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation stuff")
-	UAnimMontage* Power1Animation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
+	UAbyssActionComponent* ActionComp;
 
 	//FTimerHandle TimerHandlePrimaryAttack;
 	virtual void BeginPlay() override;
@@ -96,6 +77,8 @@ protected:
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UAbyssAttributeComponent* OwningComp, float NewHealth, float amount);
+
+	virtual FVector GetPawnViewLocation() const override;
 
 public:	
 
@@ -112,5 +95,7 @@ public:
 	void Power1();
 	void Power2();
 	void InitAnimations();
+	void StartSprint();
+	void StopSprint();
 
 };

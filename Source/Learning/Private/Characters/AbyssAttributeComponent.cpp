@@ -3,6 +3,11 @@
 
 #include "Characters/AbyssAttributeComponent.h"
 
+#include "AbyssGameModeBase.h"
+#include "Components/ActorComponent.h"
+
+static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("abyss.DamageMultiplier"), 1.0f, TEXT("Global damage modifier for attribute component."), ECVF_Cheat);
+
 // Sets default values for this component's properties
 UAbyssAttributeComponent::UAbyssAttributeComponent()
 {
@@ -37,13 +42,32 @@ bool UAbyssAttributeComponent::CheckIfActorIsAlive(AActor* TargetActor)
 
 bool UAbyssAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float amount)
 {
+	if (amount < 0.0f)
+	{
+		float DamageMultiplier = CVarDamageMultiplier.GetValueOnGameThread();
+
+		amount *= DamageMultiplier;
+	}
+
 	Health += amount;
 
 	Health = FMath::Clamp(Health, 0, MaxHealth);
 
+	UE_LOG(LogTemp, Log, TEXT("Bot Health: %f"), Health);
+
 	OnHealthChanged.Broadcast(InstigatorActor, this, Health, amount);
 
-	return true;
+	if (!IsAlive())
+	{
+		AAbyssGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AAbyssGameModeBase>();
+
+		if (GameMode)
+		{
+			GameMode->OnActorKilled(GetOwner(), InstigatorActor);
+		}
+	}
+
+	return IsAlive();
 }
 
 bool UAbyssAttributeComponent::IsAlive() const

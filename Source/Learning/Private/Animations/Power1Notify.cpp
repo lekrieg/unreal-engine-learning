@@ -7,7 +7,8 @@
 
 void UPower1Notify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-	OnNotified.Broadcast();
+	ACharacter* Character = Cast<ACharacter>(MeshComp->GetOwner());
+	OnNotified.Broadcast(Character);
 
 	Super::Notify(MeshComp, Animation, EventReference);
 }

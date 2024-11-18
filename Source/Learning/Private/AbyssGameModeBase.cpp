@@ -7,9 +7,12 @@
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "Logging/LogMacros.h"
 #include "AI/AbyssAICharacter.h"
+#include "Characters/AbyssCharacter.h"
 #include "Characters/AbyssAttributeComponent.h"
 #include "EngineUtils.h"
 #include "DrawDebugHelpers.h"
+
+static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("abyss.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
 AAbyssGameModeBase::AAbyssGameModeBase()
 {
@@ -25,6 +28,41 @@ void AAbyssGameModeBase::StartPlay()
 
 void AAbyssGameModeBase::SpawnBotTimerElapsed()
 {
+	if (CVarSpawnBots.GetValueOnGameThread())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Bot spawning disabled via cvar 'CVarSpawBots'."));
+
+		return;
+	}
+	int32 NumberOfAliveBots = 4;
+	for (TActorIterator<AAbyssAICharacter> It(GetWorld()); It; ++It)
+	{
+		AAbyssAICharacter* Bot = *It;
+
+		UAbyssAttributeComponent* AttributeComp = UAbyssAttributeComponent::GetAttributeComp(Bot);
+
+		if (AttributeComp && AttributeComp->IsAlive())
+		{
+			NumberOfAliveBots++;
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Found %i alive bots"), NumberOfAliveBots);
+
+	//float MaxBotCount = 10.0f;
+	float MaxBotCount = 1.0f;
+
+	if (DifficultyCurve)
+	{
+		MaxBotCount = DifficultyCurve->GetFloatValue(GetWorld()->TimeSeconds);
+	}
+
+	if (NumberOfAliveBots >= MaxBotCount)
+	{
+		UE_LOG(LogTemp, Log, TEXT("At maximum bot capacity. Skipping bot spawn!"));
+		return;
+	}
+
 	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
 
 	if (ensure(QueryInstance))
@@ -41,34 +79,6 @@ void AAbyssGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Que
 		return;
 	}
 
-	int32 NumberOfAliveBots = 0;
-	for (TActorIterator<AAbyssAICharacter> It(GetWorld()); It; ++It)
-	{
-		AAbyssAICharacter* Bot = *It;
-
-		UAbyssAttributeComponent* AttributeComp = UAbyssAttributeComponent::GetAttributeComp(Bot);
-
-		if (AttributeComp && AttributeComp->IsAlive())
-		{
-			NumberOfAliveBots++;
-		}
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("Found %i alive bots"), NumberOfAliveBots);
-
-	float MaxBotCount = 10.0f;
-
-	if (DifficultyCurve)
-	{
-		MaxBotCount = DifficultyCurve->GetFloatValue(GetWorld()->TimeSeconds);
-	}
-
-	if (NumberOfAliveBots >= MaxBotCount)
-	{
-		UE_LOG(LogTemp, Log, TEXT("At maximum bot capacity. Skipping bot spawn!"));
-		return;
-	}
-
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
 
 	if (Locations.Num() > 0)
@@ -77,4 +87,33 @@ void AAbyssGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Que
 
 		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Blue, false, 60.0);
 	}
+}
+
+void AAbyssGameModeBase::RespawnPlayerElapsed(AController* Controller)
+{
+	if (ensure(Controller))
+	{
+		Controller->UnPossess();
+		RestartPlayer(Controller);
+	}
+}
+
+void AAbyssGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
+{
+	// TODO: Fix this thing, the spawn is bugged
+	AAbyssCharacter* Player = Cast<AAbyssCharacter>(VictimActor);
+
+	if (Player)
+	{
+		FTimerHandle TimerHandleRespawnDelay;
+
+		FTimerDelegate Delegate;
+		Delegate.BindUFunction(this, "RespawnPlayerElapsed", Player->GetController());
+		//Delegate.BindUObject(this, &AAbyssGameModeBase::RespawnPlayerElapsed, Player->GetController());
+
+		float RespawnDelay = 2.0f;
+		GetWorldTimerManager().SetTimer(TimerHandleRespawnDelay, Delegate, RespawnDelay, false);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
 }

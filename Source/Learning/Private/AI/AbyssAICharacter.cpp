@@ -11,6 +11,8 @@
 #include "DrawDebugHelpers.h"
 #include "BrainComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "UI/AbyssWorldUserWidget.h"
 
 AAbyssAICharacter::AAbyssAICharacter()
 {
@@ -21,6 +23,9 @@ AAbyssAICharacter::AAbyssAICharacter()
 	AttributeComp = CreateDefaultSubobject<UAbyssAttributeComponent>("AttribComp");
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 void AAbyssAICharacter::PostInitializeComponents()
@@ -45,6 +50,18 @@ void AAbyssAICharacter::OnHealthChanged(AActor* InstigatorActor, UAbyssAttribute
 
 	}
 
+	if (!ActiveHealthBar)
+	{
+		ActiveHealthBar = CreateWidget<UAbyssWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+
+		if (ActiveHealthBar)
+		{
+			ActiveHealthBar->AttachedActor = this;
+			ActiveHealthBar->AddToViewport();
+		}
+	}
+
+
 	if (amount < 0.0f)
 	{
 		if (NewHealth > 0)
@@ -64,6 +81,7 @@ void AAbyssAICharacter::OnHealthChanged(AActor* InstigatorActor, UAbyssAttribute
 			}
 
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			GetCharacterMovement()->DisableMovement();
 
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
 			GetMesh()->SetCollisionProfileName("Ragdoll");

@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/AbyssCharacter.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "Delegates/DelegateCombinations.h"
 #include "ProjectileAttackNotify.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnNotifiedSignature);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnNotifiedSignature, ACharacter*);
 
 /**
  * 

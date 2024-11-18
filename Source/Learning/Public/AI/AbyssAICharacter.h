@@ -4,11 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Blueprint/UserWidget.h"
 #include "AbyssAICharacter.generated.h"
 
 // there's the perception too, check this later
 class UPawnSensingComponent;
 class UAbyssAttributeComponent;
+class UUserWidget;
+class UAbyssWorldUserWidget;
 
 UCLASS()
 class LEARNING_API AAbyssAICharacter : public ACharacter
@@ -20,6 +23,11 @@ public:
 	AAbyssAICharacter();
 
 protected:
+
+	UAbyssWorldUserWidget* ActiveHealthBar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
