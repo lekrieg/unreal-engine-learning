@@ -45,6 +45,8 @@ void UAbyssAction_ProjectileAttack::AttackTimeElapsed(ACharacter* Instigator)
 	SpawnParameters.Instigator = Instigator;
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTransformMatrix, SpawnParameters);
+
+	StopAction(Instigator);
 }
 
 void UAbyssAction_ProjectileAttack::InitAnimations()

@@ -42,6 +42,8 @@ void UAbyssAction_Blackhole::AttackTimeElapsed(ACharacter* Instigator)
 	SpawnParameters.Instigator = Instigator;
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTransformMatrix, SpawnParameters);
+
+	StopAction(Instigator);
 }
 
 void UAbyssAction_Blackhole::InitAnimations()

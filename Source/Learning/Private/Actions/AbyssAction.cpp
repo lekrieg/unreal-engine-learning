@@ -18,7 +18,7 @@ void UAbyssAction::StartAction_Implementation(AActor* Instigator)
 
 void UAbyssAction::StopAction_Implementation(AActor* Instigator)
 {
-	UE_LOG(LogTemp, Log, TEXT("Running: %s"), *GetNameSafe(this));
+	UE_LOG(LogTemp, Log, TEXT("Stopped: %s"), *GetNameSafe(this));
 
 	ensureAlways(bIsRunning);
 
