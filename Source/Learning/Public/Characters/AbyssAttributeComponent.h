@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Delegates/DelegateCombinations.h"
+#include "GameplayTagsClasses.h"
 #include "AbyssAttributeComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, UAbyssAttributeComponent*, OwningComp, float, NewHealth, float, amount);
@@ -19,6 +20,15 @@ public:
 	UAbyssAttributeComponent();
 
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Keycards")
+	bool bHasGreenKey;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Keycards")
+	bool bHasBlueKey;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Keycards")
+	bool bHasRedKey;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attribute")
 	float Health;
@@ -47,4 +57,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetActualHealth() const;
 
+	UFUNCTION(BlueprintCallable)
+	void UpdateObtainedKeycards(FGameplayTag KeyCardTag);
 };

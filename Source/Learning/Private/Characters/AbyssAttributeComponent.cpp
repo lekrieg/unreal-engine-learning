@@ -5,6 +5,7 @@
 
 #include "AbyssGameModeBase.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagsClasses.h"
 
 static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("abyss.DamageMultiplier"), 1.0f, TEXT("Global damage modifier for attribute component."), ECVF_Cheat);
 
@@ -83,4 +84,20 @@ bool UAbyssAttributeComponent::IsHealthFull() const
 float UAbyssAttributeComponent::GetActualHealth() const
 {
 	return Health;
+}
+
+void UAbyssAttributeComponent::UpdateObtainedKeycards(FGameplayTag KeyCardTag)
+{
+	if (KeyCardTag == UGameplayTagsManager::Get().RequestGameplayTag("KeyCards.Blue"))
+	{
+		bHasBlueKey = !bHasBlueKey;
+	}
+	else if (KeyCardTag == UGameplayTagsManager::Get().RequestGameplayTag("KeyCards.Red"))
+	{
+		bHasRedKey = !bHasRedKey;
+	}
+	else if (KeyCardTag == UGameplayTagsManager::Get().RequestGameplayTag("KeyCards.Green"))
+	{
+		bHasGreenKey = !bHasGreenKey;
+	}
 }

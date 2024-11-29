@@ -11,6 +11,7 @@
 class UStaticMeshComponent;
 
 UCLASS()
+
 class LEARNING_API AKeyCard : public AActor, public IAbyssGameplayInterface
 {
 	GENERATED_BODY()

@@ -9,6 +9,7 @@
 
 class UAbyssAction;
 
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class LEARNING_API UAbyssActionComponent : public UActorComponent
 {

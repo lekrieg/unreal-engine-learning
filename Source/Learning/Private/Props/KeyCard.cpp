@@ -5,6 +5,7 @@
 
 #include "Actions/AbyssActionComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Characters/AbyssAttributeComponent.h"
 
 // Sets default values
 AKeyCard::AKeyCard()
@@ -15,13 +16,20 @@ AKeyCard::AKeyCard()
 
 void AKeyCard::Interact_Implementation(APawn* InstigatorPawn)
 {
-	UAbyssActionComponent* AttribComp = InstigatorPawn->GetComponentByClass<UAbyssActionComponent>();
+	UAbyssActionComponent* ActionComp = InstigatorPawn->GetComponentByClass<UAbyssActionComponent>();
 
-	if (AttribComp)
+	if (ActionComp)
 	{
 		if (ensure(KeyCardTag.IsValid()))
 		{
-			AttribComp->ActiveGameplayTags.AddTag(KeyCardTag);
+			ActionComp->ActiveGameplayTags.AddTag(KeyCardTag);
+
+			UAbyssAttributeComponent* AttribComp = InstigatorPawn->GetComponentByClass<UAbyssAttributeComponent>();
+			if (AttribComp)
+			{
+				AttribComp->UpdateObtainedKeycards(KeyCardTag);
+			}
+
 			SetLifeSpan(0.1f);
 		}
 	}

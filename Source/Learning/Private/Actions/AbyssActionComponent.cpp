@@ -15,7 +15,6 @@ UAbyssActionComponent::UAbyssActionComponent()
 	// ...
 }
 
-
 // Called when the game starts
 void UAbyssActionComponent::BeginPlay()
 {
@@ -26,7 +25,6 @@ void UAbyssActionComponent::BeginPlay()
 		AddAction(ActionClass);
 	}
 }
-
 
 // Called every frame
 void UAbyssActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
