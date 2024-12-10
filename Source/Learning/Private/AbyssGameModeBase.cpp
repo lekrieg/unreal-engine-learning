@@ -11,6 +11,8 @@
 #include "Characters/AbyssAttributeComponent.h"
 #include "EngineUtils.h"
 #include "DrawDebugHelpers.h"
+#include "AbyssPlayerState.h"
+#include "Kismet/GameplayStatics.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("abyss.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
@@ -116,4 +118,14 @@ void AAbyssGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
+}
+
+void AAbyssGameModeBase::ApplyCredits(AActor* FuckThisShit, float Amount)
+{
+	AAbyssPlayerState* AbyssPlayerState = Cast<AAbyssPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+
+	if (AbyssPlayerState)
+	{
+		AbyssPlayerState->ApplyCreditsChange(FuckThisShit, Amount);
+	}
 }

@@ -50,6 +50,17 @@ void AHealthPotionItem::Interact_Implementation(APawn* InstigatorPawn)
 		{
 			PlaySound(PickUpSound);
 
+			// TODO: Add credits costs
+			// TODO: Add Coin animation
+			// TODO: Add Coin credits earning
+			// TODO: Add Coin effect
+			// TODO: Add an eqs to randomly spawn health potions and Coins
+
+			if (EmitterTemplate)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, GetActorLocation(), FRotator::ZeroRotator, true);
+			}
+
 			MeshComp->SetVisibility(!MeshComp->IsVisible());
 			bCanInteract = false;
 

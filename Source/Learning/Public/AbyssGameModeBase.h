@@ -50,4 +50,6 @@ protected:
 public:
 
 	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
+
+	void ApplyCredits(AActor* FuckThisShit, float Amount);
 };

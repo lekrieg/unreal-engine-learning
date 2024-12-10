@@ -86,6 +86,11 @@ float UAbyssAttributeComponent::GetActualHealth() const
 	return Health;
 }
 
+float UAbyssAttributeComponent::GetCredits() const
+{
+	return Credits;
+}
+
 void UAbyssAttributeComponent::UpdateObtainedKeycards(FGameplayTag KeyCardTag)
 {
 	if (KeyCardTag == UGameplayTagsManager::Get().RequestGameplayTag("KeyCards.Blue"))

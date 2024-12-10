@@ -21,6 +21,9 @@ public:
 
 protected:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Credits stuff")
+	float Credits;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Keycards")
 	bool bHasGreenKey;
 
@@ -56,6 +59,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetActualHealth() const;
+
+	float GetCredits() const;
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateObtainedKeycards(FGameplayTag KeyCardTag);

@@ -13,6 +13,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UI/AbyssWorldUserWidget.h"
+#include "AbyssGameModeBase.h"
 
 AAbyssAICharacter::AAbyssAICharacter()
 {
@@ -87,6 +88,13 @@ void AAbyssAICharacter::OnHealthChanged(AActor* InstigatorActor, UAbyssAttribute
 			GetMesh()->SetCollisionProfileName("Ragdoll");
 
 			SetLifeSpan(10.0f);
+
+			AAbyssGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AAbyssGameModeBase>();
+
+			if (GameMode)
+			{
+				GameMode->ApplyCredits(GetOwner(), AttributeComp->GetCredits());
+			}
 		}
 	}
 }
